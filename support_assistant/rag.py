@@ -32,57 +32,45 @@ def load_documents():
     return documents
 
 
-def create_vector_store():
-    """Create the ChromaDB collection and store document embeddings."""
+def get_vector_store():
+    """Get the ChromaDB collection, creating it if necessary."""
 
     documents = load_documents()
 
-    print(f"Loaded {len(documents)} documents.")
-
-    # Load the local embedding model
     model = SentenceTransformer(EMBEDDING_MODEL_NAME)
 
-    # Persistent ChromaDB client
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
 
-    # Create or get our collection
     collection = client.get_or_create_collection(
         name="zepto_policies",
         configuration={"hnsw": {"space": "cosine"}},
     )
 
-    # Add each document
-    for document in documents:
-        embedding = model.encode(document["text"]).tolist()
+    if collection.count() == 0:
+        for document in documents:
+            embedding = model.encode(document["text"]).tolist()
 
-        collection.upsert(
-            ids=[document["id"]],
-            documents=[document["text"]],
-            embeddings=[embedding],
-            metadatas=[
-                {
-                    "document_id": document["id"],
-                }
-            ],
-        )
+            collection.upsert(
+                ids=[document["id"]],
+                documents=[document["text"]],
+                embeddings=[embedding],
+                metadatas=[
+                    {
+                        "document_id": document["id"],
+                    }
+                ],
+            )
 
-        print(f"Added: {document['id']}")
-
-    print(f"\nChromaDB collection contains {collection.count()} documents.")
+        print(f"Added {len(documents)} documents to ChromaDB.")
 
     return collection
 
-
 def retrieve_documents(query, top_k=3):
-    """Retrieve the most relevant policy documents for a query."""
+    """Retrieve the most relevant policy documents."""
 
     model = SentenceTransformer(EMBEDDING_MODEL_NAME)
 
-    client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-
-    collection = client.get_collection(
-        name="zepto_policies"
-    )
+    collection = get_vector_store()
 
     query_embedding = model.encode(query).tolist()
 
