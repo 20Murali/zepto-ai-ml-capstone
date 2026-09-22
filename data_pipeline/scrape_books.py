@@ -141,7 +141,7 @@ def clean_data(all_books):
     df["rating"] = df["rating"].map(rating_map)
 
     df["in_stock"] = df["availability"].str.contains("In stock",case=False,na=False)
-
+    #Capstone requirement: fixed conversion rate of 1 GBP = 105.50 INR.
     df["price_inr"] = df["price_gbp"] * 105.50
     df["price_inr"] = df["price_inr"].round(2)
 
@@ -159,12 +159,6 @@ def build_dataset(category_limit=5):
     URL = "https://books.toscrape.com/"
     all_books=get_all_books(URL,category_limit)
     df=clean_data(all_books)
-    print(
-    (
-        df["price_inr"]
-        == (df["price_gbp"] * 105.50).round(2)
-    ).all()
-)
 
     return df
 
