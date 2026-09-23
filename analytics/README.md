@@ -214,6 +214,12 @@ The models were compared using accuracy, precision, recall, F1 score, and ROC-AU
 
 ---
 
+### Model Selection
+
+Random Forest was selected as the final saved model because it achieved the highest test accuracy (0.820225) and the highest F1 score (0.746032) among the three evaluated models.
+
+The final Random Forest pipeline, including preprocessing and the classifier, is saved as `best_model.joblib`.
+
 ## Model Evaluation
 
 Evaluation includes:
