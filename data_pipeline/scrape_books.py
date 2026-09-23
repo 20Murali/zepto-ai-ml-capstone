@@ -128,7 +128,11 @@ def clean_data(all_books):
 
     df = pd.DataFrame(all_books)
 
-    df["price_gbp"] = (df["price"].str.replace("Â£", "", regex=False).astype(float))
+    df["price_gbp"] = pd.to_numeric(
+    df["price"].str.replace("Â£", ""),
+    errors="coerce"
+    )
+
 
     rating_map = {
         "One": 1,

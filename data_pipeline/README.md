@@ -133,3 +133,4 @@ The database file is stored as:
 ```text
 data_pipeline/zepto_books.db
 ```
+database.py automatically recreates the SQLite database, so the .db file does not need to be committed.
