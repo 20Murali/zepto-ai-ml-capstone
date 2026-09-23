@@ -1,7 +1,10 @@
+import os
 from typing import TypedDict
 from support_assistant.rag import retrieve_documents
 from support_assistant.models import AskResponse
 from langgraph.graph import StateGraph, START, END
+
+MOCK_LLM = os.getenv("MOCK_LLM", "1") == "1"
 
 
 class GraphState(TypedDict, total=False):
@@ -26,10 +29,18 @@ POLICY_KEYWORDS = [
 def classify_intent(state: GraphState):
     query = state["query"].lower()
 
-    if any(keyword in query for keyword in POLICY_KEYWORDS):
-        intent = "policy_question"
+    if MOCK_LLM:
+        if any(keyword in query for keyword in POLICY_KEYWORDS):
+            intent = "policy_question"
+        else:
+            intent = "general_question"
     else:
-        intent = "general_question"
+        # Real LLM mode can be added later.
+        # For the capstone, mock mode is the required mode.
+        if any(keyword in query for keyword in POLICY_KEYWORDS):
+            intent = "policy_question"
+        else:
+            intent = "general_question"
 
     return {
         "intent": intent
@@ -37,21 +48,23 @@ def classify_intent(state: GraphState):
 
 
 def retrieve_and_answer(state: GraphState):
-    """Retrieve relevant policy documents and generate a mock answer."""
-
     query = state["query"]
 
     results = retrieve_documents(query, top_k=3)
 
-    # Get the top retrieved document
-    top_document_id = results["ids"][0][0]
     top_document = results["documents"][0][0]
 
-    # Required mock-mode answer
-    answer = (
-        f"Based on the retrieved context: "
-        f"{top_document[:200]}"
-    )
+    if MOCK_LLM:
+        answer = (
+            f"Based on the retrieved context: "
+            f"{top_document[:200]}"
+        )
+    else:
+        # Real LLM generation can be added later.
+        answer = (
+            f"Based on the retrieved context: "
+            f"{top_document[:200]}"
+        )
 
     return {
         "answer": answer,

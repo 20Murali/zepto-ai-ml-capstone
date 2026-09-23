@@ -256,7 +256,7 @@ docker build -t zepto-support-assistant .
 Run the container:
 
 ```bash
-docker run -p 7860:7860 zepto-support-assistant
+docker run -p 8000:8000 zepto-support-assistant
 ```
 
 The API will be available through:

@@ -84,7 +84,7 @@ def retrieve_documents(query, top_k=3):
 
 if __name__ == "__main__":
 
-    create_vector_store()
+    get_vector_store()
 
     results = retrieve_documents(
         "What is the delivery fee?"
